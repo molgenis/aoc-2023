@@ -10,7 +10,9 @@ We will use https://deno.com as that is a one shot develop and run tool. So Type
 
 - your favourite text editor Codium, VSCode has Deno support
 - https://deno.land/manual/getting_started/installation (using brew, winget, etc)
+- make sure deno does typescript by enabling config `deno.enable`
 - you can configure to run the current file
+- or use the shell `deno run 00/00.ts`
 
 ## Puzzles
 
