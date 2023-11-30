@@ -8,7 +8,7 @@ We will use https://deno.com as that is a one shot develop and run tool. So Type
 
 ### Download and install
 
-- your favourite text editor Coium, VSCode has Deno support
+- your favourite text editor Codium, VSCode has Deno support
 - https://deno.land/manual/getting_started/installation (using brew, winget, etc)
 - you can configure to run the current file
 
