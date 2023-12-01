@@ -13,6 +13,7 @@ We will use https://deno.com as that is a one shot develop and run tool. So Type
 - make sure deno does typescript by enabling config `deno.enable`
 - you can configure to run the current file
 - or use the shell `deno run 00/00.ts`
+- https://code.visualstudio.com/docs/editor/variables-reference for your launch config
 
 ## Puzzles
 
