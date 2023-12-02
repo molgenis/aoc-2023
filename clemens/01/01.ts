@@ -8,14 +8,7 @@ const dataPath = `./clemens/${aocNR}`;
 
 console.log("Puzzel: ", path.basename(dataPath));
 
-const DEBUG = true;
 const MODE = 2;
-
-const print = (s:string,i:number) => {
-    if (MODE !== i) return;
-    if (!DEBUG) return;
-    console.log(s)
-}
 
 let input = Deno.readTextFileSync(`${dataPath}/01.txt`);
 let t1 = Deno.readTextFileSync(`${dataPath}/t1.txt`);
@@ -49,5 +42,5 @@ const p2 = (inp:string) => {
     }).reduce((p,c) => p + c, 0);
 }
 console.log(`t2 ${p2(t2)}`);
+// 54110 wrong
 console.log(`v2 ${p2(input)}`);
-
