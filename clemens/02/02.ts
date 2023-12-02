@@ -8,7 +8,7 @@ const dataPath = `./clemens/${aocNR}`;
 
 console.log("Puzzel: ", path.basename(dataPath));
 
-const MODE = 2;
+const MODE = 0;
 
 let input = Deno.readTextFileSync(`${dataPath}/${aocNR}.txt`);
 let t1 = Deno.readTextFileSync(`${dataPath}/t1.txt`);
@@ -30,7 +30,7 @@ const makeDicts = (inp:string) => {
     })
 }
 
-if (MODE==1) {
+if (MODE<=1) {
 
     const can_play = { red:12, green:13, blue:14, };
     const p1 = (inp:string) => {
@@ -48,7 +48,7 @@ if (MODE==1) {
     console.log(`v1 ${p1(input)}`);
 }
 
-if (MODE==2) {
+if (MODE<1 || MODE==2) {
 
     const p2 = (inp:string) => {
         return makeDicts(inp).map((v) => {
@@ -61,7 +61,7 @@ if (MODE==2) {
 
 }
 
-// ChatGPT
+// ChatGPT without editing
 function compareDicts(dict1: { [key: string]: number }, dict2: { [key: string]: number }): boolean {
     for (let key in dict2) {
         if (!dict1.hasOwnProperty(key)) {
@@ -74,7 +74,7 @@ function compareDicts(dict1: { [key: string]: number }, dict2: { [key: string]: 
     return true; // all checks passed
 }
 
-let dict1 = { red: 12, green: 13, blue: 14 };
-let dict2 = { red: 10, green: 13, blue: 14 };
+// let dict1 = { red: 12, green: 13, blue: 14 };
+// let dict2 = { red: 10, green: 13, blue: 14 };
 
-console.log(compareDicts(dict1, dict2)); // should print true
+// console.log(compareDicts(dict1, dict2)); // should print true
