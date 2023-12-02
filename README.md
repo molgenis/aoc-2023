@@ -34,8 +34,10 @@ To keep organised make a 2-digit day folder containing code and download.
 
 ## Structure
 
-tbd
+We make named subtree like `<name>/<day>/<day>.ts + <data>.txt`.
+
+See the current tree.
 
 ## Example
 
-tbd
+See `./example/00/00.ts`
