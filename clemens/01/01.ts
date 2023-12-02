@@ -17,7 +17,7 @@ let t2 = Deno.readTextFileSync(`${dataPath}/t2.txt`);
 
 const p1 = (inp:string) => {
     const replaceLetters = /[a-z]/gi;
-    return inp.split('\n').map((v,_i,_a) => { 
+    return inp.split('\n').map((v,_i,_a) => {
     const clean = v.replace(replaceLetters, '');
     return parseInt(clean[0] + clean[clean.length-1]);
 }).reduce((p,c) => p + c, 0);
@@ -27,20 +27,38 @@ if (MODE==1) {
     console.log(`t1 ${p1(t1)}`);
     console.log(`v1 ${p1(input)}`);
 }
-const digits = [ 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
-let digitAndDigitWord = digits.map((v,i) => `${i+1}|${v}`).join('|');
-console.log(digitAndDigitWord);
 
+const digits = [ 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+const digitAndDigitWord = digits.map((v,i) => `${i+1}|${v}`).join('|');
+
+// Make sure not to fail on overlapping words ie `oneight`, `threeight`, `fiveight`, etc
 const p2 = (inp:string) => {
-    const replaceLetters = RegExp(`(${digitAndDigitWord})`, "gi");
-    return inp.split('\n').map((v,_i,_a) => { 
-        const matched = v.match(replaceLetters);
+    const replaceLetters = RegExp(`(${digitAndDigitWord})`, "g");
+    return inp.split('\n').map((v,i,_a) => {
+        let matched = v.match(replaceLetters);
         const fromWord = (v) => {if (digits.indexOf(v) > -1) v = digits.indexOf(v)+1; return v;}
-        const f = fromWord(matched[0]);
-        const l = fromWord(matched[matched.length-1]);
+
+        const firstMatch = matched[0];
+        const lastMatch = matched[matched.length-1];
+        const f = fromWord(firstMatch);
+        let l = fromWord(lastMatch);
+        // console.log(i, ':', matched[0], f, matched[matched.length-1], l, " : ", v, matched);
+
+        let pos = v.lastIndexOf(lastMatch);
+        let reSearch = v.slice(pos+1);
+        matched = reSearch.match(replaceLetters);
+        if (matched?.length>0) {
+            //  console.log('\n>>', reSearch, l, ' XXXXXXXXXXX ', matched)
+            l = fromWord(matched[0]);
+        }
         return parseInt(`${f}${l}`);
     }).reduce((p,c) => p + c, 0);
 }
-console.log(`t2 ${p2(t2)}`);
-// 54110 wrong
-console.log(`v2 ${p2(input)}`);
+
+if (MODE < 1 || MODE == 2) {
+    // console.log(`t2 ${p2('oneight')}`);
+    console.log(`t2 ${p2(t2)}`);
+    // 54110 wrong
+    // 54094 correct
+    console.log(`v2 ${p2(input)}`);
+}
