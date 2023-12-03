@@ -41,3 +41,15 @@ See the current tree.
 ## Example
 
 See `./example/00/00.ts`
+
+## Code snippets
+
+```typescript
+for (const [index, value] of data.entries()) { codeblock }
+
+const p1 = (inp:string) => { codeblock }
+
+// build regex option string "1|one|2|two..."
+const digitWords = [ 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+const digitAndDigitWord = digitWords.map((v,i) => `${i+1}|${v}`).join('|');
+```
