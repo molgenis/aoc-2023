@@ -50,10 +50,10 @@ class PuzzleSolver:
 
 
 if __name__ == '__main__':
-    test_file = 'test-input.txt'
+    test_file = 't1.txt'
     test_solver = PuzzleSolver(test_file)
     test_solution = test_solver.solve()
 
-    real_file = 'input.txt'
+    real_file = '04.txt'
     real_solver = PuzzleSolver(real_file)
     real_solution = real_solver.solve(show_matching=True)
