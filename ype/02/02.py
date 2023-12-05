@@ -24,6 +24,18 @@ class PuzzleSolver:
 
     def solve_part_2(self) -> int:
         """Solves the second part of the puzzle."""
+        colors = ['red', 'blue', 'green']
+        power_sum = 0
+        for idx, sets in self.games.items():
+            max_colors = {col: max(_set.get(col, 0) for _set in sets) for col in colors}
+            cube_power = 1
+            for val in max_colors.values():
+                cube_power *= val
+            power_sum += cube_power
+
+        print(f"The sum of the power of the minimum cube sets equals {power_sum}.")
+
+        return power_sum
 
     @staticmethod
     def _set_feasible(_set: dict):
