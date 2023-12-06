@@ -13,8 +13,9 @@ class PuzzleSolver:
 
     def solve_part_1(self) -> int:
         """Solves the first part of the puzzle."""
-        loc_nums = []
 
+        # Find for each seed the location by trickling them through the mappings
+        loc_nums = []
         for seed in self.data['seeds']:
             destination = seed
             for key, values in self.data.items():
@@ -31,17 +32,50 @@ class PuzzleSolver:
     def solve_part_2(self) -> int:
         """Solves the second part of the puzzle."""
 
-        min_loc = 10**10
-        for seed in self._seed_range():
-            destination = seed
-            for key, values in self.data.items():
-                if '-' not in key:
-                    continue
-                source = destination
-                destination = self._find_destination(source, values)
+        # Construct the ranges of seed numbers from the input
+        seed_combos = [self.data['seeds'][2 * i:2 * i + 2] for i in range(int(len(self.data['seeds']) / 2))]
+        seed_ranges = [[sc[0], sc[0]+sc[1]] for sc in seed_combos]
 
-            if destination < min_loc:
-                min_loc = destination
+        # Create a copy of the mappings indexed with increasing integers instead of mapping names
+        mappings = {idx-1: values for idx, (key, values) in enumerate(self.data.items()) if '-' in key}
+
+        # Gather in each mapping the lower bounds of the ranges
+        source_lbs = {
+            key: [val[1] for val in values]
+            for key, values in mappings.items()
+        }
+
+        # Iterate over the lower bounds of each mapping and
+        # find out to which seed and location number they correspond
+        seed_to_loc = {}
+        for map_idx, lbs in source_lbs.items():
+            for lb in lbs:
+                _key = map_idx
+                d = lb
+                while _key <= max(mappings.keys()):
+                    s = d
+                    d = self._find_destination(s, mappings[_key])
+                    _key += 1
+                loc = d
+
+                _key = map_idx
+                s = lb
+                while _key > min(mappings.keys()):
+                    d = s
+                    s = self._find_source(d, mappings[_key-1])
+                    _key -= 1
+                seed = s
+                seed_to_loc.update({seed: loc})
+
+        # Filter the seed-to-location dictionary for those seeds that appear in any of the seed ranges
+        seed_to_loc = {
+            seed: loc
+            for seed, loc in seed_to_loc.copy().items()
+            if any([seed in range(*sr) for sr in seed_ranges])
+        }
+
+        # Find the minimum location number among the valid combinations
+        min_loc = min(seed_to_loc.values())
 
         print(f"The minimal location number is {min_loc}.")
         return min_loc
@@ -53,7 +87,18 @@ class PuzzleSolver:
         for _m in _mappings:
             if _s in range(_m[1], _m[1] + _m[2]):
                 _d = _m[0] + (_s - _m[1])
+                break
         return _d
+
+    @staticmethod
+    def _find_source(_d: int, _mappings: list[list]) -> int:
+        """Find the source corresponding to a destination number using the mapping."""
+        _s = _d
+        for _m in _mappings:
+            if _d in range(_m[0], _m[0] + _m[2]):
+                _s = _m[1] + (_d - _m[0])
+                break
+        return _s
 
     def _seed_range(self):
         """Returns a seed from one of the ranges without storing all possible seeds in memory."""
@@ -85,7 +130,7 @@ class PuzzleSolver:
 
 
 if __name__ == '__main__':
-    print(f"Test solutions.")
+    print(f"Test solutions")
     test_file = 't1.txt'
     test_solver = PuzzleSolver(test_file)
     print(f"\nSolution for part 1")
@@ -93,10 +138,10 @@ if __name__ == '__main__':
     print(f"\nSolution for part 2")
     test_solution_2 = test_solver.solve_part_2()
 
-    print(f"\n\nReal solutions.")
+    print(f"\n\nReal solutions")
     real_file = '05.txt'
     real_solver = PuzzleSolver(real_file)
-    real_solution_1 = real_solver.solve_part_1()
     print(f"\nSolution for part 1")
-    real_solution_2 = real_solver.solve_part_2()
+    real_solution_1 = real_solver.solve_part_1()
     print(f"\nSolution for part 2")
+    real_solution_2 = real_solver.solve_part_2()
