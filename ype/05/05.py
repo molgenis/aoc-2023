@@ -87,7 +87,6 @@ class PuzzleSolver:
         for _m in _mappings:
             if _s in range(_m[1], _m[1] + _m[2]):
                 _d = _m[0] + (_s - _m[1])
-                break
         return _d
 
     @staticmethod
@@ -97,19 +96,11 @@ class PuzzleSolver:
         for _m in _mappings:
             if _d in range(_m[0], _m[0] + _m[2]):
                 _s = _m[1] + (_d - _m[0])
-                break
         return _s
-
-    def _seed_range(self):
-        """Returns a seed from one of the ranges without storing all possible seeds in memory."""
-        seed_combos = [self.data['seeds'][2*i:2*i+2] for i in range(int(len(self.data['seeds'])/2))]
-        for sc in seed_combos:
-            for _seed in range(sc[0], sc[0]+sc[1]):
-                yield _seed
 
     @staticmethod
     def _read_input(fn: str) -> dict:
-        """Reads in the txt file and returns the list of cards."""
+        """Reads in the txt file and returns the seed numbers and mappings."""
         with open(file=fn) as f:
             raw_data = f.readlines()
 

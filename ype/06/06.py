@@ -40,7 +40,7 @@ class PuzzleSolver:
 
     @staticmethod
     def _read_input(fn: str, q: int) -> dict:
-        """Reads in the txt file and returns the list of cards."""
+        """Reads in the txt file and returns a dictionary of time and distance."""
         with open(file=fn) as f:
             raw_data = f.readlines()
         if q == 1:

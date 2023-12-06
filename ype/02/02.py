@@ -45,7 +45,7 @@ class PuzzleSolver:
 
     @staticmethod
     def _read_input(fn: str) -> dict:
-        """Reads in the txt file and returns the list of cards."""
+        """Reads in the txt file and returns a dictionary of the games."""
         with open(file=fn) as f:
             raw_data = f.readlines()
         games = {
