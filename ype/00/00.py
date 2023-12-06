@@ -27,7 +27,7 @@ class PuzzleSolver:
 
 
 if __name__ == '__main__':
-    print(f"Test solutions.")
+    print(f"Test solutions")
     test_file = 't1.txt'
     test_solver = PuzzleSolver(test_file)
     print(f"\nSolution for part 1")
@@ -35,10 +35,10 @@ if __name__ == '__main__':
     print(f"\nSolution for part 2")
     test_solution_2 = test_solver.solve_part_2()
 
-    print(f"\n\nReal solutions.")
+    print(f"\n\nReal solutions")
     real_file = '00.txt'
     real_solver = PuzzleSolver(real_file)
-    real_solution_1 = real_solver.solve_part_1()
     print(f"\nSolution for part 1")
-    real_solution_2 = real_solver.solve_part_2()
+    real_solution_1 = real_solver.solve_part_1()
     print(f"\nSolution for part 2")
+    real_solution_2 = real_solver.solve_part_2()

@@ -30,14 +30,6 @@ class PuzzleSolver:
 
     def solve_part_2(self) -> int:
         """Solves the second part of the puzzle."""
-        # loc_nums = {}
-        # seed_combos = [self.data['seeds'][2*i:2*i+2] for i in range(int(len(self.data['seeds'])/2))]
-        # all_seeds = [
-        #     seeds for combo in seed_combos for seeds in range(combo[0], combo[0]+combo[1])
-        # ]
-        # all_seeds = []
-        # for sc in seed_combos:
-        #     all_seeds.extend(range(sc[0], sc[0]+sc[1]))
 
         min_loc = 10**10
         for seed in self._seed_range():
@@ -48,8 +40,6 @@ class PuzzleSolver:
                 source = destination
                 destination = self._find_destination(source, values)
 
-            # loc_nums.append(destination)
-            # loc_nums[seed] = destination
             if destination < min_loc:
                 min_loc = destination
 
@@ -71,8 +61,6 @@ class PuzzleSolver:
         for sc in seed_combos:
             for _seed in range(sc[0], sc[0]+sc[1]):
                 yield _seed
-
-
 
     @staticmethod
     def _read_input(fn: str) -> dict:

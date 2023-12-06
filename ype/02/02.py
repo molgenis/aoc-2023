@@ -15,7 +15,7 @@ class PuzzleSolver:
         """Solves the first part of the puzzle."""
         possible_games = []
         for idx, sets in self.games.items():
-            if all(map(self._set_feasible, sets)):
+            if all(map(self._is_set_feasible, sets)):
                 possible_games.append(idx)
 
         print(f"The sum of the IDs of the possible games equals {sum(possible_games)}.")
@@ -29,8 +29,8 @@ class PuzzleSolver:
         for idx, sets in self.games.items():
             max_colors = {col: max(_set.get(col, 0) for _set in sets) for col in colors}
             cube_power = 1
-            for val in max_colors.values():
-                cube_power *= val
+            for col_max in max_colors.values():
+                cube_power *= col_max
             power_sum += cube_power
 
         print(f"The sum of the power of the minimum cube sets equals {power_sum}.")
@@ -38,7 +38,7 @@ class PuzzleSolver:
         return power_sum
 
     @staticmethod
-    def _set_feasible(_set: dict):
+    def _is_set_feasible(_set: dict):
         """Checks if a set of cubes fits the constraint."""
         constraints = {'red': 12, 'green': 13, 'blue': 14}
         return all(v <= constraints[k] for (k, v) in _set.items())
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     print(f"\n\nReal solutions.")
     real_file = '02.txt'
     real_solver = PuzzleSolver(real_file)
-    real_solution_1 = real_solver.solve_part_1()
     print(f"\nSolution for part 1")
-    real_solution_2 = real_solver.solve_part_2()
+    real_solution_1 = real_solver.solve_part_1()
     print(f"\nSolution for part 2")
+    real_solution_2 = real_solver.solve_part_2()
