@@ -30,7 +30,18 @@ class PuzzleSolver:
         return min(loc_nums)
 
     def solve_part_2(self) -> int:
-        """Solves the second part of the puzzle."""
+        """Solves the second part of the puzzle.
+
+        The reasoning is as follows:
+        the seed that yields the local minimum location number within a seed range is either
+        - the lower bound of the seed range
+        - mapped to a smaller number as the lower bound in a mapping range.
+
+        Therefore, the number of potentially optimal solutions can be reduced to
+        those seeds that at any one stage of the mapping process are the lower bound of a range.
+        The minimum solution can then be obtained by comparing the locations
+        corresponding to the remaining seeds
+        """
 
         # Construct the ranges of seed numbers from the input
         seed_combos = [self.data['seeds'][2 * i:2 * i + 2] for i in range(int(len(self.data['seeds']) / 2))]
@@ -39,64 +50,65 @@ class PuzzleSolver:
         # Create a copy of the mappings indexed with increasing integers instead of mapping names
         mappings = {idx-1: values for idx, (key, values) in enumerate(self.data.items()) if '-' in key}
 
-        # Gather in each mapping the lower bounds of the ranges
+        # Gather in each mapping the lower bounds of the source ranges
         source_lbs = {
             key: [val[1] for val in values]
             for key, values in mappings.items()
         }
 
+        # Construct the list of seeds that are the lower bound of a range
+        lb_seeds = [seed for seed in [sr[0] for sr in seed_ranges]]
+
         # Iterate over the lower bounds of each mapping and
-        # find out to which seed and location number they correspond
-        seed_to_loc = {}
+        # find out to which seed they correspond
         for map_idx, lbs in source_lbs.items():
             for lb in lbs:
-                _key = map_idx
-                d = lb
-                while _key <= max(mappings.keys()):
-                    s = d
-                    d = self._find_destination(s, mappings[_key])
-                    _key += 1
-                loc = d
+                key = map_idx
+                source = lb
+                while key > min(mappings.keys()):
+                    destination = source
+                    source = self._find_source(destination, mappings[key-1])
+                    key -= 1
+                seed = source
+                lb_seeds.append(seed)
 
-                _key = map_idx
-                s = lb
-                while _key > min(mappings.keys()):
-                    d = s
-                    s = self._find_source(d, mappings[_key-1])
-                    _key -= 1
-                seed = s
-                seed_to_loc.update({seed: loc})
+        # Filter the list of lower bound seeds for those seeds that appear in any of the seed ranges
+        lb_seeds = [seed for seed in lb_seeds if any([seed in range(*sr) for sr in seed_ranges])]
 
-        # Filter the seed-to-location dictionary for those seeds that appear in any of the seed ranges
-        seed_to_loc = {
-            seed: loc
-            for seed, loc in seed_to_loc.copy().items()
-            if any([seed in range(*sr) for sr in seed_ranges])
-        }
+        # Find the location numbers for each seed
+        seed_to_loc = {}
+        for seed in lb_seeds:
+            destination = seed
+            for key, values in mappings.items():
+                source = destination
+                destination = self._find_destination(source, values)
+            location = destination
 
-        # Find the minimum location number among the valid combinations
+            seed_to_loc[seed] = location
+
+        # Find the minimum location number among the results
         min_loc = min(seed_to_loc.values())
 
         print(f"The minimal location number is {min_loc}.")
         return min_loc
 
     @staticmethod
-    def _find_destination(_s: int, _mappings: list[list]) -> int:
+    def _find_destination(s: int, _mappings: list[list]) -> int:
         """Finds the destination corresponding to a source number using the mapping."""
-        _d = _s
-        for _m in _mappings:
-            if _s in range(_m[1], _m[1] + _m[2]):
-                _d = _m[0] + (_s - _m[1])
-        return _d
+        d = s
+        for m in _mappings:
+            if s in range(m[1], m[1] + m[2]):
+                d = m[0] + (s - m[1])
+        return d
 
     @staticmethod
-    def _find_source(_d: int, _mappings: list[list]) -> int:
+    def _find_source(d: int, _mappings: list[list]) -> int:
         """Find the source corresponding to a destination number using the mapping."""
-        _s = _d
-        for _m in _mappings:
-            if _d in range(_m[0], _m[0] + _m[2]):
-                _s = _m[1] + (_d - _m[0])
-        return _s
+        s = d
+        for m in _mappings:
+            if d in range(m[0], m[0] + m[2]):
+                s = m[1] + (d - m[0])
+        return s
 
     @staticmethod
     def _read_input(fn: str) -> dict:
