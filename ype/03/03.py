@@ -16,8 +16,11 @@ class PuzzleSolver:
 
     def solve_part_1(self) -> int:
         """Solves the first part of the puzzle."""
-        part_sum = 0
+        # Gather the coordinates of the symbols
         sym_locs = list(map(lambda sym: sym[1], self.symbols))
+
+        # Find the numbers that are adjacent to a symbol and sum them up
+        part_sum = 0
         for num in self.numbers:
             n_len = len(num[0])
             row_range = range(max(0, num[1][0]-1), num[1][0]+2)
@@ -30,19 +33,27 @@ class PuzzleSolver:
 
     def solve_part_2(self) -> int:
         """Solves the second part of the puzzle."""
-        gear_ratio_sum = 0
+
+        # Collect the coordinates of the gears
         gears = [sym[1] for sym in self.symbols if sym[0] == '*']
+
+        # Find for each number the ranges in which a part is symbol adjacent to the number
         range_boxes = [
             [num[0],
              [range(max(0, num[1][0]-1), num[1][0]+2),
               range(max(0, num[1][1]-1), num[1][1]+len(num[0])+1)]]
             for num in self.numbers
         ]
+
+        # Collect for each gear the numbers that are adjacent to it
         gear_numbers = [
             [num[0] for num in range_boxes
              if any(gear == [i, j] for i in num[1][0] for j in num[1][1])]
             for gear in gears
         ]
+
+        # Compute the gear ratios for the gears with two adjacent numbers and sum them up
+        gear_ratio_sum = 0
         for gn in gear_numbers:
             if len(gn) == 2:
                 gear_ratio_sum += int(gn[0]) * int(gn[1])
