@@ -55,7 +55,6 @@ class PuzzleSolver:
         loop_len = int(steps / len(self.instruction)) - loop_starts[node]
         return {'start': loop_starts[node], 'length': loop_len}
 
-
     @staticmethod
     def _read_input(fn: str) -> tuple[str, dict]:
         """Reads in the txt file and returns the parsed data."""
