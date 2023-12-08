@@ -30,6 +30,26 @@ class PuzzleSolver:
 
     def solve_part_2(self) -> int:
         """Solves the second part of the puzzle."""
+        gear_ratio_sum = 0
+        gears = [sym[1] for sym in self.symbols if sym[0] == '*']
+        range_boxes = [
+            [num[0],
+             [range(max(0, num[1][0]-1), num[1][0]+2),
+              range(max(0, num[1][1]-1), num[1][1]+len(num[0])+1)]]
+            for num in self.numbers
+        ]
+        gear_numbers = [
+            [num[0] for num in range_boxes
+             if any(gear == [i, j] for i in num[1][0] for j in num[1][1])]
+            for gear in gears
+        ]
+        for gn in gear_numbers:
+            if len(gn) == 2:
+                gear_ratio_sum += int(gn[0]) * int(gn[1])
+
+        print(f"The sum of all gear ratios equals {gear_ratio_sum}.")
+
+        return gear_ratio_sum
 
     @staticmethod
     def _read_input(fn: str) -> tuple[list, list]:
