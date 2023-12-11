@@ -15,24 +15,41 @@ class PuzzleSolver:
         return "Solver for puzzle 11"
 
     def solve_part_1(self) -> int:
-        """Solves the first part of the puzzle."""
+        """Solves the first part of the puzzle.
 
+        The reasoning is as follows:
+        after identifying the locations of the galaxies and the rows and columns without a galaxy,
+        the locations of the galaxies are 'moved' by the number of empty rows and columns that precede them.
+        Then the distances between each galaxy are calculated by summing the distances column-wise and row-wise.
+        The actual length between the galaxies is then half of the sum of distances calculated in the previous step.
+        """
+
+        # Expand the universe
         galaxies = [
             [i + sum(map(lambda ngc: ngc < i, self.ngc)),
              j + sum(map(lambda ngr: ngr < j, self.ngr))]
             for i, j in self.galaxies
         ]
 
+        # Tally the distances between each galaxy
         length_sum = sum(max(a[0]-b[0], b[0]-a[0]) + max(a[1]-b[1], b[1]-a[1])
                          for a in galaxies for b in galaxies)
 
         # Halve the sum
         length_sum = int(length_sum/2)
+
         print(f"The sum of the lengths equals {length_sum}.")
         return length_sum
 
     def solve_part_2(self) -> int:
-        """Solves the second part of the puzzle."""
+        """Solves the second part of the puzzle.
+
+        The solution for this part follows the same reasoning and procedures as in part one
+        with the exception that the empty rows and columns in the original universe are
+        replaced with 1000000 empty rows and columns.
+        """
+
+        # Expand the universe
         factor = 1_000_000 - 1
         galaxies = [
             [i + factor * sum(map(lambda ngc: ngc < i, self.ngc)),
@@ -40,6 +57,7 @@ class PuzzleSolver:
             for i, j in self.galaxies
         ]
 
+        # Tally the distances between each galaxy
         length_sum = sum(max(a[0]-b[0], b[0]-a[0]) + max(a[1]-b[1], b[1]-a[1])
                          for a in galaxies for b in galaxies)
 
