@@ -33,19 +33,20 @@ class PuzzleSolver:
         s_tile, = [[i, j] for j in range(len(self.tiles[0])) for (i, row) in enumerate(self.tiles) if row[j] == 'S']
         current_tiles = [
             [s_tile, [i, j]]
-            for j in range(len(self.tiles[0])) for (i, row) in enumerate(self.tiles)
-            if any(map(lambda p: [i+p[1], j+p[0]] == s_tile, self.pipes[self.tiles[i][j]]))
+            for (i, row) in enumerate(self.tiles) for j in range(len(row))
+            if any(map(lambda _p: [i + _p[1], j + _p[0]] == s_tile, self.pipes[self.tiles[i][j]]))
         ]
 
         # In each iteration, find for both itinerary the tile that is connected
         # to the current tile that is unequal to the previous tile
         steps = 1
         while current_tiles[0][1] != current_tiles[1][1]:
-            next_tiles = []
-            for ct in current_tiles:
-                for p in self.pipes[self.tiles[ct[1][0]][ct[1][1]]]:
-                    if (nt := [ct[1][0] + p[1], ct[1][1] + p[0]]) != ct[0]:
-                        next_tiles.append(nt)
+            next_tiles = [
+                nt
+                for ct in current_tiles
+                for p in self.pipes[self.tiles[ct[1][0]][ct[1][1]]]
+                if (nt := [ct[1][0] + p[1], ct[1][1] + p[0]]) != ct[0]
+            ]
             current_tiles = list(map(lambda _ct, _nt: [_ct[1], _nt], current_tiles, next_tiles))
             steps += 1
 
@@ -55,13 +56,55 @@ class PuzzleSolver:
 
     def solve_part_2(self) -> int:
         """Solves the second part of the puzzle."""
+        s_tile, = [[i, j] for j in range(len(self.tiles[0])) for (i, row) in enumerate(self.tiles) if row[j] == 'S']
+
+        c_tile = [[i, j]
+                  for (i, row) in enumerate(self.tiles) for j in range(len(row))
+                  if any(map(lambda _p: [i + _p[1], j + _p[0]] == s_tile, self.pipes[self.tiles[i][j]]))][0]
+        loop_tiles = [s_tile, c_tile]
+        p_tile = s_tile
+        while c_tile != s_tile:
+            n_tile, = [
+                nt
+                for p in self.pipes[self.tiles[c_tile[0]][c_tile[1]]]
+                if (nt := [c_tile[0] + p[1], c_tile[1] + p[0]]) != p_tile
+            ]
+            p_tile = c_tile
+            c_tile = n_tile
+            loop_tiles.append(n_tile)
+
+        # Replace all pipes that are not in the loop by .
+        tiles = [
+            ''.join('.' if [i, j] not in loop_tiles else self.tiles.copy()[i][j]
+                    for j in range(len(row)))
+            for i, row in enumerate(self.tiles.copy())
+        ]
+        enclosed = []
+        for i, row in enumerate(tiles):
+            for j in range(len(row)):
+                if tiles[i][j] != '.':
+                    continue
+                if (sum(map(lambda _j: [i, _j] in loop_tiles, range(j))) == 0
+                        | (sum(map(lambda _j: [i, _j] in loop_tiles, range(j, len(row)))) == 0)
+                        | (sum(map(lambda _i: [_i, j] in loop_tiles, range(i))) == 0)
+                        | (sum(map(lambda _i: [_i, j] in loop_tiles, range(i, len(tiles)))) == 0)):
+                    continue
+                if ((sum(map(lambda _j: (tiles[i][_j] in ['7', '|', 'J']) - (tiles[i][_j] in ['F', 'L']), range(j))) % 2 > 0)
+                        | (sum(map(lambda _j: (tiles[i][_j] in ['7', '|', 'J']) - (tiles[i][_j] in ['F', 'L']), range(j, len(row)))) % 2 > 0)):
+                    enclosed.append([i, j])
+                elif ((sum(map(lambda _i: (tiles[_i][j] in ['L', '-', 'J']) - (tiles[_i][j] in ['7', 'F']), range(i))) % 2 > 0)
+                        & (sum(map(lambda _i: (tiles[_i][j] in ['L', '-', 'J']) - (tiles[_i][j] in ['7', 'F']), range(i, len(tiles)))) % 2 > 0)):
+                    enclosed.append([i, j])
+
+        print(f"The number of enclosed tiles equals {len(enclosed)}.")
+        return len(enclosed)
 
     @staticmethod
     def _read_input(fn: str) -> list:
         """Reads in the txt file and returns the parsed data."""
         with open(file=fn) as f:
-            raw_data = f.readlines()
-        tiles = [list(row.strip()) for row in raw_data]
+            raw_data = f.read().splitlines()
+        tiles = raw_data
 
         return tiles
 
@@ -72,6 +115,8 @@ if __name__ == '__main__':
     test_solver = PuzzleSolver(test_file)
     print(f"\nSolution for part 1")
     test_solution_1 = test_solver.solve_part_1()
+    test_file = 't2.txt'
+    test_solver = PuzzleSolver(test_file)
     print(f"\nSolution for part 2")
     test_solution_2 = test_solver.solve_part_2()
 
