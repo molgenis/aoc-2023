@@ -79,21 +79,14 @@ class PuzzleSolver:
                     for j in range(len(row)))
             for i, row in enumerate(self.tiles.copy())
         ]
+
         enclosed = []
         for i, row in enumerate(tiles):
             for j in range(len(row)):
-                if tiles[i][j] != '.':
+                if [i, j] in loop_tiles:
                     continue
-                if (sum(map(lambda _j: [i, _j] in loop_tiles, range(j))) == 0
-                        | (sum(map(lambda _j: [i, _j] in loop_tiles, range(j, len(row)))) == 0)
-                        | (sum(map(lambda _i: [_i, j] in loop_tiles, range(i))) == 0)
-                        | (sum(map(lambda _i: [_i, j] in loop_tiles, range(i, len(tiles)))) == 0)):
-                    continue
-                if ((sum(map(lambda _j: (tiles[i][_j] in ['7', '|', 'J']) - (tiles[i][_j] in ['F', 'L']), range(j))) % 2 > 0)
-                        | (sum(map(lambda _j: (tiles[i][_j] in ['7', '|', 'J']) - (tiles[i][_j] in ['F', 'L']), range(j, len(row)))) % 2 > 0)):
-                    enclosed.append([i, j])
-                elif ((sum(map(lambda _i: (tiles[_i][j] in ['L', '-', 'J']) - (tiles[_i][j] in ['7', 'F']), range(i))) % 2 > 0)
-                        & (sum(map(lambda _i: (tiles[_i][j] in ['L', '-', 'J']) - (tiles[_i][j] in ['7', 'F']), range(i, len(tiles)))) % 2 > 0)):
+                if sum(map(lambda ch: tiles[i][j:].replace('-', '').count(ch),
+                           ['L7', 'FJ', '|'])) % 2 > 0:
                     enclosed.append([i, j])
 
         print(f"The number of enclosed tiles equals {len(enclosed)}.")
