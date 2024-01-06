@@ -26,35 +26,73 @@ class PuzzleSolver:
 
     def solve_part_2(self) -> int:
         """Solves the second part of the puzzle."""
-        limits = {'x': [], 'm': [], 'a': [], 's': []}
-        for rule in self.rules.values():
-            for r in rule:
-                if '<' in r:
-                    cat, lim = r.split(':')[0].split('<')
-                    limits[cat].append(int(lim))
-                elif '>' in r:
-                    cat, lim = r.split(':')[0].split('>')
-                    limits[cat].append(int(lim)+1)
-                else:
-                    pass
-        for key, values in limits.items():
-            limits[key] = [1] + sorted(limits[key]) + [4001]
-        print(limits)
         combinations = 0
-        for i_x, x in enumerate(limits['x'][:-1]):
-            for i_m, m in enumerate(limits['m'][:-1]):
-                for i_a, a in enumerate(limits['a'][:-1]):
-                    for i_s, s in enumerate(limits['s'][:-1]):
-                        part = {'x': x, 'm': m, 'a': a, 's': s}
-                        if self._is_accepted(part):
-                            combinations += ((limits['x'][i_x+1] - limits['x'][i_x])
-                                             * (limits['m'][i_m+1] - limits['m'][i_m])
-                                             * (limits['a'][i_a+1] - limits['a'][i_a])
-                                             * (limits['s'][i_s+1] - limits['s'][i_s]))
+        ranges = [{
+            'x': range(1, 4001),
+            'm': range(1, 4001),
+            'a': range(1, 4001),
+            's': range(1, 4001)
+        }]
+        send_to = ['in']
+
+        while len(ranges) != 0:
+            r = ranges.pop(0)
+            s = send_to.pop(0)
+            for rule in self.rules[s]:
+                if ':' not in rule:
+                    if rule == 'R':
+                        continue
+                    elif rule == 'A':
+                        combinations += self._range_product(r)
+                    else:
+                        ranges.append(r)
+                        send_to.append(rule)
+                elif '<' in rule:
+                    cat, [limit, _send_to] = rule.split('<')[0], rule.split('<')[1].split(':')
+                    _r = {
+                        k: (v if k != cat else range(v.start, int(limit)))
+                        for k, v in r.items()
+                    }
+                    r = {
+                        k: (v if k != cat else range(int(limit), v.stop))
+                        for k, v in r.items()
+                    }
+                    if _send_to == 'R':
+                        pass
+                    elif _send_to == 'A':
+                        combinations += self._range_product(_r)
+                    else:
+                        ranges.append(_r)
+                        send_to.append(_send_to)
+                else:
+                    cat, [limit, _send_to] = rule.split('>')[0], rule.split('>')[1].split(':')
+                    _r = {
+                        k: (v if k != cat else range(int(limit)+1, v.stop))
+                        for k, v in r.items()
+                    }
+                    r = {
+                        k: (v if k != cat else range(v.start, int(limit)+1))
+                        for k, v in r.items()
+                    }
+                    if _send_to == 'R':
+                        pass
+                    elif _send_to == 'A':
+                        combinations += self._range_product(_r)
+                    else:
+                        ranges.append(_r)
+                        send_to.append(_send_to)
 
         print(f"the number of distinct combinations equals {combinations}")
 
         return combinations
+
+    @staticmethod
+    def _range_product(_r: dict) -> int:
+        """Calculates the number of combinations of the ranges."""
+        prod = 1
+        for v in _r.values():
+            prod *= len(v)
+        return prod
 
     def _is_accepted(self, part: dict):
         """Verifies whether a part is accepted."""
@@ -79,6 +117,34 @@ class PuzzleSolver:
         if rule == 'A':
             return True
         return False
+
+    def _prepare_rules(self) -> dict:
+        """Modifies the set of rules to reduce the number of rules required to be checked."""
+        _rules = self.rules.copy()
+        changes = 100
+        while changes != 0:
+            changes = 0
+            for key, values in _rules.items():
+                if len(values) > 1 and all(map(lambda r: r.split(':')[-1] == 'A', values[-2:])):
+                    _rules[key] = values[:-2] + ['A']
+                    changes += 1
+                elif len(values) > 1 and all(map(lambda r: r.split(':')[-1] == 'R', values[-2:])):
+                    _rules[key] = values[:-2] + ['R']
+                    changes += 1
+                elif len(values) == 1 and values[0] == 'A':
+                    _rules = {
+                        _k: [_r.replace(key, 'A') for _r in _v]
+                        for _k, _v in _rules.items() if _v[0] != 'A'
+                    }
+                    changes += 1
+                elif len(values) == 1 and values[0] == 'R':
+                    _rules = {
+                        _k: [_r.replace(key, 'R') for _r in _v]
+                        for _k, _v in _rules.items() if _v[0] != 'R'
+                    }
+                    changes += 1
+
+        return _rules
 
     @staticmethod
     def _read_input(fn: str) -> tuple[dict, list]:
